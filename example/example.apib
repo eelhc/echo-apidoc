@@ -1,0 +1,159 @@
+
+# Group Example
+
+## /users
+
+### ListUsers [GET]
+ListUsers return all of user informations.
+
+
++ Request
+
+    + Header
+
+            Accept-Encoding: gzip
+            
+
+
+
++ Response 200
+
+    + Header
+
+            Content-Type: application/json; charset=UTF-8
+            
+
+
+    + Body
+
+            {
+                "gopher1": {
+                    "id": "gopher1",
+                    "email": "gopher1@gmail.com"
+                },
+                "gopher2": {
+                    "id": "gopher2",
+                    "email": "gopher1@gmail.com"
+                }
+            }
+
+
+
+### CreateUsers [POST]
+CreateUsers create users with request data.
+
+
++ Request
+
+    + Header
+
+            Content-Type: application/json; charset=UTF-8
+            Accept-Encoding: gzip
+            
+
+
+    + Body
+
+            [{"id":"gopher3", "email": "gopher3@gmail.com"}]
+
+
++ Response 204
+
+
+
+
+### DeleteAllUsers [DELETE]
+DeleteAllUsers delete all of user informations.
+
+
++ Request
+
+    + Header
+
+            Accept-Encoding: gzip
+            
+
+
+
++ Response 204
+
+
+
+
+### UpdateUsers [PUT]
+UpdateUsers update requested users information.
+
+
++ Request
+
+    + Header
+
+            Accept-Encoding: gzip
+            
+
+
+    + Body
+
+            [{"id":"gopher1", "email": "gopher111111111@gmail.com"}]
+
+
++ Response 204
+
+
+
+
+## /users/{id}
+
++ Parameters
+
+    + id (string)
+    
+
+### GetUserWithID [GET]
+GetUserWithID return a user's information with ID.
+
+
++ Request
+
+    + Header
+
+            Accept-Encoding: gzip
+            
+
+
+
++ Response 200
+
+    + Header
+
+            Content-Type: application/json; charset=UTF-8
+            
+
+
+    + Body
+
+            {
+                "id": "gopher1",
+                "email": "gopher1@gmail.com"
+            }
+
+
+
+### DeleteUserWithID [DELETE]
+DeleteUserWithID delete an user's information with ID.
+
+
++ Request
+
+    + Header
+
+            Accept-Encoding: gzip
+            
+
+
+
++ Response 204
+
+
+
+
