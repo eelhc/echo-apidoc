@@ -67,9 +67,12 @@ func FuncName(fn interface{}) string {
 	if t == nil && t.Kind() != reflect.Func {
 		return ""
 	}
-
 	fnFullPath := runtime.FuncForPC(reflect.ValueOf(fn).Pointer()).Name()
-	return strings.Replace(filepath.Ext(fnFullPath), ".", "", 1)
+	fName := strings.Replace(filepath.Ext(fnFullPath), ".", "", 1)
+	if strings.HasSuffix(fName, "-fm") {
+		fName = strings.Replace(fName, "-fm", "", 1)
+	}
+	return fName
 }
 
 func bytesToJSONPretty(data []byte, indent string) string {
