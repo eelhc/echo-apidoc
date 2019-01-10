@@ -145,21 +145,14 @@ func (doc *APIDoc) newRequest(req *http.Request, path string, fn echo.HandlerFun
 		doc.Resources[dreq.Path()] = requests
 	}
 
-	var find bool
 	for _, r := range requests {
 		if dreq.Method == r.Method {
-			find = true
-			dreq = r
-			break
+			return r
 		}
 	}
 
-	if !find {
-		dreq.HandlerName = FuncName(fn)
-		dreq.HandlerDesc = doc.pkgDoc.FuncDoc(dreq.HandlerName)
-	}
-
+	dreq.HandlerName = FuncName(fn)
+	dreq.HandlerDesc = doc.pkgDoc.FuncDoc(dreq.HandlerName)
 	doc.Resources[dreq.Path()] = append(requests, dreq)
-
 	return dreq
 }
