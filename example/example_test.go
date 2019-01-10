@@ -25,6 +25,7 @@ func TestAPIDocExample(t *testing.T) {
 	e.HideBanner = true
 	example.AddRoutes(e.Router())
 
+	// start echo server with API document generator
 	doc := apidoc.New()
 	go func() {
 		e.Use(doc.Recorder())
@@ -33,6 +34,8 @@ func TestAPIDocExample(t *testing.T) {
 
 	client := http.Client{Timeout: time.Second}
 
+
+	// test http request to record http req & resp
 	var err error
 	var resp *http.Response
 	var req *http.Request
@@ -52,20 +55,12 @@ func TestAPIDocExample(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
 
-	req, err = http.NewRequest(
-		http.MethodDelete,
-		"http://" + addr + "/users/gopher1",
-		nil,
-	)
+	req, err = http.NewRequest(http.MethodDelete, "http://" + addr + "/users/gopher1", nil)
 	resp, err = client.Do(req)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
 
-	req, err = http.NewRequest(
-		http.MethodDelete,
-		"http://" + addr + "/users",
-		nil,
-	)
+	req, err = http.NewRequest(http.MethodDelete, "http://" + addr + "/users", nil)
 	resp, err = client.Do(req)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
@@ -80,9 +75,13 @@ func TestAPIDocExample(t *testing.T) {
 	assert.NotNil(t, resp)
 
 
+	// shutdown echo server
 	ctx, cancel := context.WithTimeout(context.Background(), shutdownTimeo)
 	defer cancel()
 	require.NoError(t, ctx.Err())
 	require.NoError(t, e.Shutdown(ctx))
+
+
+	// write API document
 	assert.NoError(t, doc.Write("."))
 }

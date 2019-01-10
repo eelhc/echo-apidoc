@@ -22,7 +22,7 @@ type User struct {
 
 var dumyUsers map[string]User = map[string]User{
 	"gopher1": User{ID: "gopher1", EMAIL: "gopher1@gmail.com"},
-	"gopher2": User{ID: "gopher2", EMAIL: "gopher1@gmail.com"},
+	"gopher2": User{ID: "gopher2", EMAIL: "gopher2@gmail.com"},
 }
 
 // ListUsers return all of user informations.
