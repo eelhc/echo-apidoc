@@ -151,8 +151,9 @@ func (doc *APIDoc) newRequest(req *http.Request, path string, fn echo.HandlerFun
 		}
 	}
 
-	dreq.HandlerName = FuncName(fn)
-	dreq.HandlerDesc = doc.pkgDoc.FuncDoc(dreq.HandlerName)
+	_, sName, fName := FuncName(fn)
+	dreq.HandlerName = fName
+	dreq.HandlerDesc = doc.pkgDoc.FuncDoc(dreq.HandlerName, sName)
 	doc.Resources[dreq.Path()] = append(requests, dreq)
 	return dreq
 }

@@ -23,7 +23,10 @@ func TestAPIDocExample(t *testing.T) {
 	e := echo.New()
 	e.HidePort = true
 	e.HideBanner = true
+
 	example.AddRoutes(e.Router())
+	ctl := example.Controller{}
+	ctl.AddRoutes(e.Router())
 
 	// start echo server with API document generator
 	doc := apidoc.New()
@@ -33,7 +36,6 @@ func TestAPIDocExample(t *testing.T) {
 	}()
 
 	client := http.Client{Timeout: time.Second}
-
 
 	// test http request to record http req & resp
 	var err error
@@ -55,32 +57,34 @@ func TestAPIDocExample(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
 
-	req, err = http.NewRequest(http.MethodDelete, "http://" + addr + "/users/gopher1", nil)
+	req, err = http.NewRequest(http.MethodDelete, "http://"+addr+"/users/gopher1", nil)
 	resp, err = client.Do(req)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
 
-	req, err = http.NewRequest(http.MethodDelete, "http://" + addr + "/users", nil)
+	req, err = http.NewRequest(http.MethodDelete, "http://"+addr+"/users", nil)
 	resp, err = client.Do(req)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
 
 	req, err = http.NewRequest(
 		http.MethodPut,
-		"http://" + addr + "/users",
+		"http://"+addr+"/users",
 		bytes.NewBufferString(`[{"id":"gopher1", "email": "gopher111111111@gmail.com"}]`),
 	)
 	resp, err = client.Do(req)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
 
+	resp, err = client.Get("http://" + addr + "/withctl/users")
+	assert.NoError(t, err)
+	assert.NotNil(t, resp)
 
 	// shutdown echo server
 	ctx, cancel := context.WithTimeout(context.Background(), shutdownTimeo)
 	defer cancel()
 	require.NoError(t, ctx.Err())
 	require.NoError(t, e.Shutdown(ctx))
-
 
 	// write API document
 	assert.NoError(t, doc.Write("."))

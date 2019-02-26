@@ -6,7 +6,6 @@ import (
 	"go/parser"
 	"go/token"
 	"os"
-	"path/filepath"
 	"reflect"
 	"runtime"
 	"strconv"
@@ -16,9 +15,9 @@ import (
 )
 
 type PkgDoc struct {
-	AbsPath  string
-	PkgName  string
-	funcsMap map[string]*doc.Func
+	AbsPath string
+	PkgName string
+	funcMap map[string]*doc.Func
 }
 
 func NewPkgDoc(absPath string) *PkgDoc {
@@ -42,37 +41,56 @@ func NewPkgDoc(absPath string) *PkgDoc {
 	}
 
 	pd := &PkgDoc{
-		AbsPath:  absPath,
-		PkgName:  pkg.Name,
-		funcsMap: map[string]*doc.Func{},
+		AbsPath: absPath,
+		PkgName: pkg.Name,
+		funcMap: map[string]*doc.Func{},
 	}
 
 	goDoc := doc.New(pkg, absPath, doc.AllDecls)
+
+	for _, t := range goDoc.Types {
+		for _, m := range t.Methods {
+			pd.funcMap[t.Name+"-"+m.Name] = m
+		}
+	}
+
 	for _, fn := range goDoc.Funcs {
-		pd.funcsMap[fn.Name] = fn
+		pd.funcMap[fn.Name] = fn
 	}
 
 	return pd
 }
 
-func (p *PkgDoc) FuncDoc(fname string) string {
-	if fdoc, ok := p.funcsMap[fname]; ok {
+func (p *PkgDoc) FuncDoc(fname string, tname ...string) string {
+	if tname != nil && len(tname) > 0 && tname[0] != "" {
+		fname = tname[0] + "-" + fname
+	}
+	if fdoc, ok := p.funcMap[fname]; ok {
 		return fdoc.Doc
 	}
 	return ""
 }
 
-func FuncName(fn interface{}) string {
+func FuncName(fn interface{}) (packageName, structName, fnName string) {
 	t := reflect.TypeOf(fn)
-	if t == nil && t.Kind() != reflect.Func {
-		return ""
+	if t != nil && t.Kind() == reflect.Func {
+		path := runtime.FuncForPC(reflect.ValueOf(fn).Pointer()).Name()
+		paths := strings.Split(path, "/")
+		fnPaths := strings.Split(paths[len(paths)-1:][0], ".")
+
+		packageName = strings.Join(paths[:len(paths)-1], "/")
+		packageName += "/" + fnPaths[0]
+		fnName = fnPaths[len(fnPaths)-1:][0]
+
+		if strings.HasSuffix(fnName, "-fm") {
+			fnName = strings.Replace(fnName, "-fm", "", 1)
+		}
+
+		if len(fnPaths) > 2 {
+			structName = fnPaths[1]
+		}
 	}
-	fnFullPath := runtime.FuncForPC(reflect.ValueOf(fn).Pointer()).Name()
-	fName := strings.Replace(filepath.Ext(fnFullPath), ".", "", 1)
-	if strings.HasSuffix(fName, "-fm") {
-		fName = strings.Replace(fName, "-fm", "", 1)
-	}
-	return fName
+	return
 }
 
 func bytesToJSONPretty(data []byte, indent string) string {

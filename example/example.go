@@ -59,3 +59,15 @@ func DeleteUserWithID(c echo.Context) error {
 func DeleteAllUsers(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
+
+type Controller struct {
+}
+
+func (ctl Controller) AddRoutes(r *echo.Router) {
+	r.Add("GET", "/withctl/users", ctl.ListUsers)
+}
+
+// ListUsers for controller method test
+func (ctl Controller) ListUsers(c echo.Context) error {
+	return c.NoContent(http.StatusNoContent)
+}
